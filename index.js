@@ -2,13 +2,12 @@ import { execSync } from 'node:child_process';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
 const debug = Debug('windows-unc-path-connect');
-const uncShareAddress = /^\\\\/;
 function uncPathOptionsHasCredentials(uncPathOptions) {
     return ((uncPathOptions.userName ?? '') !== '' &&
         (uncPathOptions.password ?? '') !== '');
 }
 export function connectToUncPath(uncPathOptions, connectOptions) {
-    if (!uncShareAddress.test(uncPathOptions.uncPath)) {
+    if (!uncPathOptions.uncPath.startsWith('\\\\')) {
         return false;
     }
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
@@ -26,7 +25,7 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     return output.includes('command completed successfully');
 }
 export function disconnectUncPath(uncPath) {
-    if (!uncShareAddress.test(uncPath)) {
+    if (!uncPath.startsWith('\\\\')) {
         return false;
     }
     debug(`Disconnecting share: ${uncPath}`);

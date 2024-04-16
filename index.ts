@@ -5,8 +5,6 @@ import exitHook from 'exit-hook'
 
 const debug = Debug('windows-unc-path-connect')
 
-const uncShareAddress = /^\\\\/
-
 export type UncPath = `\\\\${string}`
 
 interface UncPathOptionsWithoutCredentials {
@@ -48,7 +46,7 @@ export function connectToUncPath(
   uncPathOptions: UncPathOptions,
   connectOptions?: Partial<ConnectOptions>
 ): boolean {
-  if (!uncShareAddress.test(uncPathOptions.uncPath)) {
+  if (!uncPathOptions.uncPath.startsWith('\\\\')) {
     return false
   }
 
@@ -81,7 +79,7 @@ export function connectToUncPath(
  * @returns {boolean} - True if the path was disconnected.
  */
 export function disconnectUncPath(uncPath: UncPath): boolean {
-  if (!uncShareAddress.test(uncPath)) {
+  if (!uncPath.startsWith('\\\\')) {
     return false
   }
 
