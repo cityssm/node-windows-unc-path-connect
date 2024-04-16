@@ -49,10 +49,10 @@ jobs:
 
       - name: Codecov
         if: ${{ github.event_name != 'pull_request' && env.CODECOV_TOKEN != '' && matrix.node == 20 }}
-        run: |
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov -t ${CODECOV_TOKEN}
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ env.CODECOV_TOKEN }}
+          slug: cityssm/node-windows-unc-path-connect
 
       - name: DeepSource
         if: ${{ github.event_name != 'pull_request' && env.DEEPSOURCE_DSN != '' && matrix.node == 20 }}
