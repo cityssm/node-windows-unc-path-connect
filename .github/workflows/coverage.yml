@@ -35,7 +35,7 @@ jobs:
       - name: Code Climate (Before)
         if: ${{ github.event_name != 'pull_request' && env.CC_TEST_REPORTER_ID != '' && matrix.node == 20 }}
         run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./codeclimate-test-reporter
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-windows-amd64 > ./codeclimate-test-reporter
           chmod +x codeclimate-test-reporter
           ./codeclimate-test-reporter before-build
 
@@ -51,7 +51,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' && env.CODECOV_TOKEN != '' && matrix.node == 20 }}
         uses: codecov/codecov-action@v4.0.1
         with:
-          token: ${{ env.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
           slug: cityssm/node-windows-unc-path-connect
 
       - name: DeepSource
