@@ -1,0 +1,38 @@
+{
+  "name": "@cityssm/windows-unc-path-connect",
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "description": "Ensures a UNC path is ready to use in Windows before use.",
+  "exports": "./index.js",
+  "scripts": {
+    "test": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect node --test test/test.js",
+    "coverage": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect c8 --reporter=lcov --reporter=text --reporter=text-summary node --test test/test.js"
+  },
+  "keywords": [
+    "windows",
+    "unc-path",
+    "file-share"
+  ],
+  "homepage": "https://github.com/cityssm/node-windows-unc-path-connect#readme",
+  "bugs": {
+    "url": "https://github.com/cityssm/node-windows-unc-path-connect/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cityssm/node-windows-unc-path-connect.git"
+  },
+  "author": "The Corporation of the City of Sault Ste. Marie",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.12.7",
+    "eslint-config-cityssm": "^1.7.0"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "exit-hook": "^4.0.0"
+  }
+}
