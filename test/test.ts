@@ -7,7 +7,7 @@ import { describe, it } from 'node:test'
 
 import { connectToUncPath, disconnectUncPath } from '../index.js'
 
-import { validUncPathOptions } from './config.js'
+import { validUncPathOptions } from './config.test.js'
 
 await describe('windows-unc-path-connect', async () => {
   for (const path of validUncPathOptions) {

@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { describe, it } from 'node:test';
 import { connectToUncPath, disconnectUncPath } from '../index.js';
-import { validUncPathOptions } from './config.js';
+import { validUncPathOptions } from './config.test.js';
 await describe('windows-unc-path-connect', async () => {
     for (const path of validUncPathOptions) {
         await it(`Successfully connects to a UNC path: ${path.uncPath}`, async () => {
