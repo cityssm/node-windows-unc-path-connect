@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "description": "Ensures a UNC path is ready to use in Windows before use.",
+  "description": "Ensures a UNC path that requires a user name and password is ready to use in Windows before use.",
   "exports": "./index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect node --test test/index.test.js",
@@ -14,7 +14,8 @@
   "keywords": [
     "windows",
     "unc-path",
-    "file-share"
+    "file-share",
+    "node-fs"
   ],
   "homepage": "https://github.com/cityssm/node-windows-unc-path-connect#readme",
   "bugs": {

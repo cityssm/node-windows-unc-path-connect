@@ -6,7 +6,8 @@
 [![DeepSource](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect.svg/?label=code+coverage&show_trend=false&token=kMenIfdyEcHVDtebaPlgkjFy)](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect/)
 [![Coverage Testing](https://github.com/cityssm/node-windows-unc-path-connect/actions/workflows/coverage.yml/badge.svg)](https://github.com/cityssm/node-windows-unc-path-connect/actions/workflows/coverage.yml)
 
-Ensures a UNC path is ready to use in Windows before use.
+Ensures a UNC path that requires a user name and password
+is ready to use in Windows before use.
 
 ## Installation
 
