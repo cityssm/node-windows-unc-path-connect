@@ -2,6 +2,9 @@ import { uncPathPrefix } from './types.js';
 function stringHasForbiddenCharacters(stringToCheck) {
     return (stringToCheck ?? '').includes('"');
 }
+export function isWindows() {
+    return process.platform === 'win32';
+}
 export function uncPathOptionsHaveCredentials(uncPathOptions) {
     return ((uncPathOptions.userName ?? '') !== '' &&
         (uncPathOptions.password ?? '') !== '');

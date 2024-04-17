@@ -10,6 +10,14 @@ function stringHasForbiddenCharacters(stringToCheck?: string): boolean {
 }
 
 /**
+ * Checks if the operating system is Windows.
+ * @returns {boolean} - True if the operating system is Windows.
+ */
+export function isWindows(): boolean {
+  return process.platform === 'win32'
+}
+
+/**
  * Checks if the options include credentials.
  * @param {UncPathOptions} uncPathOptions - UNC path options.
  * @returns {boolean} - True when the UNC path options include credentials.

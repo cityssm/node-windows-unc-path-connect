@@ -5,6 +5,7 @@ import exitHook from 'exit-hook'
 
 import type { ConnectOptions, UncPath, UncPathOptions } from './types.js'
 import {
+  isWindows,
   uncPathIsSafe,
   uncPathOptionsAreSafe,
   uncPathOptionsHaveCredentials
@@ -22,7 +23,7 @@ export function connectToUncPath(
   uncPathOptions: UncPathOptions,
   connectOptions?: Partial<ConnectOptions>
 ): boolean {
-  if (!uncPathOptionsAreSafe(uncPathOptions)) {
+  if (!isWindows() || !uncPathOptionsAreSafe(uncPathOptions)) {
     return false
   }
 
@@ -61,7 +62,7 @@ export function connectToUncPath(
  * @returns {boolean} - True if the path was disconnected.
  */
 export function disconnectUncPath(uncPath: UncPath): boolean {
-  if (!uncPathIsSafe(uncPath)) {
+  if (!isWindows() || !uncPathIsSafe(uncPath)) {
     return false
   }
 

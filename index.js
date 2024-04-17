@@ -1,10 +1,10 @@
 import { execSync } from 'node:child_process';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
-import { uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from './validators.js';
+import { isWindows, uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from './validators.js';
 const debug = Debug('windows-unc-path-connect');
 export function connectToUncPath(uncPathOptions, connectOptions) {
-    if (!uncPathOptionsAreSafe(uncPathOptions)) {
+    if (!isWindows() || !uncPathOptionsAreSafe(uncPathOptions)) {
         return false;
     }
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
@@ -29,7 +29,7 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     }
 }
 export function disconnectUncPath(uncPath) {
-    if (!uncPathIsSafe(uncPath)) {
+    if (!isWindows() || !uncPathIsSafe(uncPath)) {
         return false;
     }
     debug(`Disconnecting share: ${uncPath}`);
