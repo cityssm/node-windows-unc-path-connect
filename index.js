@@ -1,17 +1,18 @@
 import { execSync } from 'node:child_process';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
+import { uncPathPrefix } from './types.js';
 const debug = Debug('windows-unc-path-connect');
 function uncPathOptionsHasCredentials(uncPathOptions) {
     return ((uncPathOptions.userName ?? '') !== '' &&
         (uncPathOptions.password ?? '') !== '');
 }
 export function connectToUncPath(uncPathOptions, connectOptions) {
-    if (!uncPathOptions.uncPath.startsWith('\\\\')) {
+    if (!uncPathOptions.uncPath.startsWith(uncPathPrefix)) {
         return false;
     }
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
-    let command = `net use ${uncPathOptions.uncPath}`;
+    let command = `net use "${uncPathOptions.uncPath}"`;
     if (uncPathOptionsHasCredentials(uncPathOptions)) {
         command += ` /user:${uncPathOptions.userName} ${uncPathOptions.password ?? ''}`;
     }
@@ -25,11 +26,11 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     return output.includes('command completed successfully');
 }
 export function disconnectUncPath(uncPath) {
-    if (!uncPath.startsWith('\\\\')) {
+    if (!uncPath.startsWith(uncPathPrefix)) {
         return false;
     }
     debug(`Disconnecting share: ${uncPath}`);
-    const command = `net use ${uncPath} /delete`;
+    const command = `net use "${uncPath}" /delete`;
     try {
         const output = execSync(command);
         debug(output.toString().trim());

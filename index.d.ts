@@ -1,15 +1,4 @@
-export type UncPath = `\\\\${string}`;
-interface UncPathOptionsWithoutCredentials {
-    uncPath: UncPath;
-}
-type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
-    userName: string;
-    password: string;
-};
-export type UncPathOptions = UncPathOptionsWithoutCredentials | UncPathOptionsWithCredentials;
-export interface ConnectOptions {
-    deleteOnExit: boolean;
-}
+import { type ConnectOptions, type UncPath, type UncPathOptions } from './types.js';
 export declare function connectToUncPath(uncPathOptions: UncPathOptions, connectOptions?: Partial<ConnectOptions>): boolean;
 export declare function disconnectUncPath(uncPath: UncPath): boolean;
-export {};
+export type { UncPath, UncPathOptions, UncPathOptionsWithoutCredentials, UncPathOptionsWithCredentials, ConnectOptions } from './types.js';

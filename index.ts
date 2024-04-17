@@ -3,29 +3,15 @@ import { execSync } from 'node:child_process'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
 
+import {
+  type ConnectOptions,
+  type UncPath,
+  type UncPathOptions,
+  type UncPathOptionsWithCredentials,
+  uncPathPrefix
+} from './types.js'
+
 const debug = Debug('windows-unc-path-connect')
-
-export type UncPath = `\\\\${string}`
-
-interface UncPathOptionsWithoutCredentials {
-  uncPath: UncPath
-}
-
-type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
-  userName: string
-  password: string
-}
-
-export type UncPathOptions =
-  | UncPathOptionsWithoutCredentials
-  | UncPathOptionsWithCredentials
-
-export interface ConnectOptions {
-  /**
-   * Attempt to disconnect from the UNC path when the application exits.
-   */
-  deleteOnExit: boolean
-}
 
 function uncPathOptionsHasCredentials(
   uncPathOptions: UncPathOptions
@@ -46,13 +32,13 @@ export function connectToUncPath(
   uncPathOptions: UncPathOptions,
   connectOptions?: Partial<ConnectOptions>
 ): boolean {
-  if (!uncPathOptions.uncPath.startsWith('\\\\')) {
+  if (!uncPathOptions.uncPath.startsWith(uncPathPrefix)) {
     return false
   }
 
   debug(`Connecting to share: ${uncPathOptions.uncPath}`)
 
-  let command = `net use ${uncPathOptions.uncPath}`
+  let command = `net use "${uncPathOptions.uncPath}"`
 
   if (uncPathOptionsHasCredentials(uncPathOptions)) {
     command += ` /user:${uncPathOptions.userName} ${
@@ -79,13 +65,13 @@ export function connectToUncPath(
  * @returns {boolean} - True if the path was disconnected.
  */
 export function disconnectUncPath(uncPath: UncPath): boolean {
-  if (!uncPath.startsWith('\\\\')) {
+  if (!uncPath.startsWith(uncPathPrefix)) {
     return false
   }
 
   debug(`Disconnecting share: ${uncPath}`)
 
-  const command = `net use ${uncPath} /delete`
+  const command = `net use "${uncPath}" /delete`
 
   try {
     const output = execSync(command)
@@ -100,3 +86,11 @@ export function disconnectUncPath(uncPath: UncPath): boolean {
     return false
   }
 }
+
+export type {
+  UncPath,
+  UncPathOptions,
+  UncPathOptionsWithoutCredentials,
+  UncPathOptionsWithCredentials,
+  ConnectOptions
+} from './types.js'
