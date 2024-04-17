@@ -14,7 +14,7 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
     let command = `net use "${uncPathOptions.uncPath}"`;
     if (uncPathOptionsHasCredentials(uncPathOptions)) {
-        command += ` /user:${uncPathOptions.userName} ${uncPathOptions.password ?? ''}`;
+        command += ` /user:"${uncPathOptions.userName}" "${uncPathOptions.password ?? ''}"`;
     }
     const output = execSync(command);
     debug(output.toString().trim());

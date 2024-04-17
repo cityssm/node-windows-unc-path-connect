@@ -41,9 +41,9 @@ export function connectToUncPath(
   let command = `net use "${uncPathOptions.uncPath}"`
 
   if (uncPathOptionsHasCredentials(uncPathOptions)) {
-    command += ` /user:${uncPathOptions.userName} ${
+    command += ` /user:"${uncPathOptions.userName}" "${
       uncPathOptions.password ?? ''
-    }`
+    }"`
   }
 
   const output = execSync(command)
