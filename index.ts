@@ -36,17 +36,23 @@ export function connectToUncPath(
     }"`
   }
 
-  const output = execSync(command)
+  try {
+    const output = execSync(command, { stdio: 'pipe' })
 
-  debug(output.toString().trim())
+    debug(output.toString().trim())
 
-  if (connectOptions?.deleteOnExit ?? false) {
-    exitHook(() => {
-      disconnectUncPath(uncPathOptions.uncPath)
-    })
+    if (connectOptions?.deleteOnExit ?? false) {
+      exitHook(() => {
+        disconnectUncPath(uncPathOptions.uncPath)
+      })
+    }
+
+    return output.includes('command completed successfully')
+  } catch (error) {
+    return error
+      .toString()
+      .includes('Multiple connections to a server or shared resource')
   }
-
-  return output.includes('command completed successfully')
 }
 
 /**
@@ -64,7 +70,7 @@ export function disconnectUncPath(uncPath: UncPath): boolean {
   const command = `net use "${uncPath}" /delete`
 
   try {
-    const output = execSync(command)
+    const output = execSync(command, { stdio: 'pipe' })
 
     debug(output.toString().trim())
 

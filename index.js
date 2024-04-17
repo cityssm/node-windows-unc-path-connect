@@ -12,14 +12,21 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     if (uncPathOptionsHaveCredentials(uncPathOptions)) {
         command += ` /user:"${uncPathOptions.userName}" "${uncPathOptions.password ?? ''}"`;
     }
-    const output = execSync(command);
-    debug(output.toString().trim());
-    if (connectOptions?.deleteOnExit ?? false) {
-        exitHook(() => {
-            disconnectUncPath(uncPathOptions.uncPath);
-        });
+    try {
+        const output = execSync(command, { stdio: 'pipe' });
+        debug(output.toString().trim());
+        if (connectOptions?.deleteOnExit ?? false) {
+            exitHook(() => {
+                disconnectUncPath(uncPathOptions.uncPath);
+            });
+        }
+        return output.includes('command completed successfully');
     }
-    return output.includes('command completed successfully');
+    catch (error) {
+        return error
+            .toString()
+            .includes('Multiple connections to a server or shared resource');
+    }
 }
 export function disconnectUncPath(uncPath) {
     if (!uncPathIsSafe(uncPath)) {
@@ -28,7 +35,7 @@ export function disconnectUncPath(uncPath) {
     debug(`Disconnecting share: ${uncPath}`);
     const command = `net use "${uncPath}" /delete`;
     try {
-        const output = execSync(command);
+        const output = execSync(command, { stdio: 'pipe' });
         debug(output.toString().trim());
         return (output.includes('deleted successfully') ||
             output.includes('connection could not be found'));

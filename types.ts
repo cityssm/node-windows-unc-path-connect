@@ -2,11 +2,11 @@ export const uncPathPrefix = '\\\\'
 
 export type UncPath = `${typeof uncPathPrefix}${string}`
 
-interface UncPathOptionsWithoutCredentials {
+export interface UncPathOptionsWithoutCredentials {
   uncPath: UncPath
 }
 
-type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
+export type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
   userName: string
   password: string
 }

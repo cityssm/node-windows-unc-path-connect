@@ -8,8 +8,8 @@
   "description": "Ensures a UNC path is ready to use in Windows before use.",
   "exports": "./index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect node --test test/test.js",
-    "coverage": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect c8 --reporter=lcov --reporter=text --reporter=text-summary node --test test/test.js"
+    "test": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect node --test test/index.test.js",
+    "coverage": "cross-env NODE_ENV=dev DEBUG=windows-unc-path-connect c8 --reporter=lcov --reporter=text --reporter=text-summary node --test test/index.test.js"
   },
   "keywords": [
     "windows",
