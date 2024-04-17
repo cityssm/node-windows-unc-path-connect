@@ -1,19 +1,15 @@
 import { execSync } from 'node:child_process';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
-import { uncPathPrefix } from './types.js';
+import { uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from './validators.js';
 const debug = Debug('windows-unc-path-connect');
-function uncPathOptionsHasCredentials(uncPathOptions) {
-    return ((uncPathOptions.userName ?? '') !== '' &&
-        (uncPathOptions.password ?? '') !== '');
-}
 export function connectToUncPath(uncPathOptions, connectOptions) {
-    if (!uncPathOptions.uncPath.startsWith(uncPathPrefix)) {
+    if (!uncPathOptionsAreSafe(uncPathOptions)) {
         return false;
     }
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
     let command = `net use "${uncPathOptions.uncPath}"`;
-    if (uncPathOptionsHasCredentials(uncPathOptions)) {
+    if (uncPathOptionsHaveCredentials(uncPathOptions)) {
         command += ` /user:"${uncPathOptions.userName}" "${uncPathOptions.password ?? ''}"`;
     }
     const output = execSync(command);
@@ -26,7 +22,7 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
     return output.includes('command completed successfully');
 }
 export function disconnectUncPath(uncPath) {
-    if (!uncPath.startsWith(uncPathPrefix)) {
+    if (!uncPathIsSafe(uncPath)) {
         return false;
     }
     debug(`Disconnecting share: ${uncPath}`);

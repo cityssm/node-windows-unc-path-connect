@@ -3,24 +3,14 @@ import { execSync } from 'node:child_process'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
 
+import type { ConnectOptions, UncPath, UncPathOptions } from './types.js'
 import {
-  type ConnectOptions,
-  type UncPath,
-  type UncPathOptions,
-  type UncPathOptionsWithCredentials,
-  uncPathPrefix
-} from './types.js'
+  uncPathIsSafe,
+  uncPathOptionsAreSafe,
+  uncPathOptionsHaveCredentials
+} from './validators.js'
 
 const debug = Debug('windows-unc-path-connect')
-
-function uncPathOptionsHasCredentials(
-  uncPathOptions: UncPathOptions
-): uncPathOptions is UncPathOptionsWithCredentials {
-  return (
-    ((uncPathOptions as UncPathOptionsWithCredentials).userName ?? '') !== '' &&
-    ((uncPathOptions as UncPathOptionsWithCredentials).password ?? '') !== ''
-  )
-}
 
 /**
  * Connects to a given UNC path.
@@ -32,7 +22,7 @@ export function connectToUncPath(
   uncPathOptions: UncPathOptions,
   connectOptions?: Partial<ConnectOptions>
 ): boolean {
-  if (!uncPathOptions.uncPath.startsWith(uncPathPrefix)) {
+  if (!uncPathOptionsAreSafe(uncPathOptions)) {
     return false
   }
 
@@ -40,7 +30,7 @@ export function connectToUncPath(
 
   let command = `net use "${uncPathOptions.uncPath}"`
 
-  if (uncPathOptionsHasCredentials(uncPathOptions)) {
+  if (uncPathOptionsHaveCredentials(uncPathOptions)) {
     command += ` /user:"${uncPathOptions.userName}" "${
       uncPathOptions.password ?? ''
     }"`
@@ -65,7 +55,7 @@ export function connectToUncPath(
  * @returns {boolean} - True if the path was disconnected.
  */
 export function disconnectUncPath(uncPath: UncPath): boolean {
-  if (!uncPath.startsWith(uncPathPrefix)) {
+  if (!uncPathIsSafe(uncPath)) {
     return false
   }
 
