@@ -30,6 +30,11 @@ await describe('windows-unc-path-connect', async () => {
 });
 await describe('windows-unc-path-connect/validators', async () => {
     const goodUncPaths = ['\\\\192.168.1.1\\folder'];
+    const badUncPaths = [
+        '192.168.1.1',
+        '\\192.168.1.1',
+        '\\\\192.168.1.1\\folder" /delete'
+    ];
     await describe('uncPathIsSafe()', async () => {
         await it('Returns "true" for good UNC paths', () => {
             for (const goodUncPath of goodUncPaths) {
@@ -37,11 +42,6 @@ await describe('windows-unc-path-connect/validators', async () => {
             }
         });
         await it('Returns "false" for bad UNC paths', () => {
-            const badUncPaths = [
-                '192.168.1.1',
-                '\\192.168.1.1',
-                '\\\\192.168.1.1\\folder" /delete'
-            ];
             for (const badUncPath of badUncPaths) {
                 assert.strictEqual(uncPathIsSafe(badUncPath), false);
                 assert.strictEqual(uncPathOptionsAreSafe({

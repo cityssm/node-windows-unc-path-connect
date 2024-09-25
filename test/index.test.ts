@@ -52,6 +52,13 @@ await describe('windows-unc-path-connect', async () => {
 await describe('windows-unc-path-connect/validators', async () => {
   const goodUncPaths: UncPath[] = ['\\\\192.168.1.1\\folder']
 
+  const badUncPaths = [
+    // eslint-disable-next-line sonarjs/no-hardcoded-ip
+    '192.168.1.1', // missing slashes
+    '\\192.168.1.1', // missing double slash beginning
+    '\\\\192.168.1.1\\folder" /delete' // includes double quote
+  ]
+  
   await describe('uncPathIsSafe()', async () => {
     await it('Returns "true" for good UNC paths', () => {
       for (const goodUncPath of goodUncPaths) {
@@ -60,15 +67,10 @@ await describe('windows-unc-path-connect/validators', async () => {
     })
 
     await it('Returns "false" for bad UNC paths', () => {
-      const badUncPaths = [
-        // eslint-disable-next-line sonarjs/no-hardcoded-ip
-        '192.168.1.1', // missing slashes
-        '\\192.168.1.1', // missing double slash beginning
-        '\\\\192.168.1.1\\folder" /delete' // includes double quote
-      ]
 
       for (const badUncPath of badUncPaths) {
         assert.strictEqual(uncPathIsSafe(badUncPath), false)
+
         assert.strictEqual(
           uncPathOptionsAreSafe({
             uncPath: badUncPath
