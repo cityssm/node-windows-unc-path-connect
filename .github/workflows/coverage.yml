@@ -28,7 +28,7 @@ jobs:
           npm install -g c8 cross-env
 
       - name: Copy Test Config
-        run: cp ./test/config/config.githubActions.js ./test/config/config.test.js
+        run: cp ./test/config/config.githubActions.js ./test/config/config.js
         
       - name: Run Coverage Testing
         run: npm run coverage

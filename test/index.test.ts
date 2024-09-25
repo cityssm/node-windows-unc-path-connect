@@ -12,7 +12,7 @@ import {
 } from '../index.js'
 import { uncPathIsSafe, uncPathOptionsHaveCredentials } from '../validators.js'
 
-import { validUncPathOptions } from './config/config.test.js'
+import { validUncPathOptions } from './config/config.js'
 
 await describe('windows-unc-path-connect', async () => {
   for (const path of validUncPathOptions) {
