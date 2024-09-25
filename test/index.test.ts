@@ -11,7 +11,11 @@ import {
   connectToUncPath,
   disconnectUncPath
 } from '../index.js'
-import { uncPathIsSafe, uncPathOptionsHaveCredentials } from '../validators.js'
+import {
+  uncPathIsSafe,
+  uncPathOptionsAreSafe,
+  uncPathOptionsHaveCredentials
+} from '../validators.js'
 
 import { validUncPathOptions } from './config/config.js'
 
@@ -46,7 +50,6 @@ await describe('windows-unc-path-connect', async () => {
 })
 
 await describe('windows-unc-path-connect/validators', async () => {
-
   const goodUncPaths: UncPath[] = ['\\\\192.168.1.1\\folder']
 
   await describe('uncPathIsSafe()', async () => {
@@ -66,6 +69,12 @@ await describe('windows-unc-path-connect/validators', async () => {
 
       for (const badUncPath of badUncPaths) {
         assert.strictEqual(uncPathIsSafe(badUncPath), false)
+        assert.strictEqual(
+          uncPathOptionsAreSafe({
+            uncPath: badUncPath
+          }),
+          false
+        )
       }
     })
   })

@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { describe, it } from 'node:test';
 import { connectToUncPath, disconnectUncPath } from '../index.js';
-import { uncPathIsSafe, uncPathOptionsHaveCredentials } from '../validators.js';
+import { uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from '../validators.js';
 import { validUncPathOptions } from './config/config.js';
 await describe('windows-unc-path-connect', async () => {
     for (const path of validUncPathOptions) {
@@ -44,6 +44,9 @@ await describe('windows-unc-path-connect/validators', async () => {
             ];
             for (const badUncPath of badUncPaths) {
                 assert.strictEqual(uncPathIsSafe(badUncPath), false);
+                assert.strictEqual(uncPathOptionsAreSafe({
+                    uncPath: badUncPath
+                }), false);
             }
         });
     });
