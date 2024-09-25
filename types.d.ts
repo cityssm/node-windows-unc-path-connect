@@ -4,8 +4,8 @@ export interface UncPathOptionsWithoutCredentials {
     uncPath: UncPath;
 }
 export type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
-    userName: string;
-    password: string;
+    userName: Exclude<string, ''>;
+    password: Exclude<string, ''>;
 };
 export type UncPathOptions = UncPathOptionsWithoutCredentials | UncPathOptionsWithCredentials;
 export interface ConnectOptions {

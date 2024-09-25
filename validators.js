@@ -6,11 +6,13 @@ export function isWindows() {
     return process.platform === 'win32';
 }
 export function uncPathOptionsHaveCredentials(uncPathOptions) {
-    return ((uncPathOptions.userName ?? '') !== '' &&
-        (uncPathOptions.password ?? '') !== '');
+    return ((uncPathOptions.userName ??
+        '') !== '' &&
+        (uncPathOptions.password ??
+            '') !== '');
 }
 export function uncPathIsSafe(uncPath) {
-    return uncPath.startsWith(uncPathPrefix) && !stringHasForbiddenCharacters(uncPath);
+    return (uncPath.startsWith(uncPathPrefix) && !stringHasForbiddenCharacters(uncPath));
 }
 export function uncPathOptionsAreSafe(uncPathOptions) {
     if (!uncPathIsSafe(uncPathOptions.uncPath)) {

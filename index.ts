@@ -1,3 +1,6 @@
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
+/* eslint-disable sonarjs/os-command */
+
 import { execSync } from 'node:child_process'
 
 import Debug from 'debug'
@@ -15,9 +18,9 @@ const debug = Debug('windows-unc-path-connect')
 
 /**
  * Connects to a given UNC path.
- * @param {UncPathOptions} uncPathOptions - UNC path and optional connection credentials.
- * @param {Partial<ConnectOptions>} connectOptions - Optional options for the connection.
- * @returns {boolean} - True when the connection is made successfully.
+ * @param uncPathOptions - UNC path and optional connection credentials.
+ * @param connectOptions - Optional options for the connection.
+ * @returns True when the connection is made successfully.
  */
 export function connectToUncPath(
   uncPathOptions: UncPathOptions,
@@ -33,7 +36,7 @@ export function connectToUncPath(
 
   if (uncPathOptionsHaveCredentials(uncPathOptions)) {
     command += ` /user:"${uncPathOptions.userName}" "${
-      uncPathOptions.password ?? ''
+      uncPathOptions.password
     }"`
   }
 
@@ -50,7 +53,7 @@ export function connectToUncPath(
 
     return output.includes('command completed successfully')
   } catch (error) {
-    return error
+    return (error as Error)
       .toString()
       .includes('Multiple connections to a server or shared resource')
   }
@@ -58,8 +61,8 @@ export function connectToUncPath(
 
 /**
  * Disconnects a given UNC path.
- * @param {UncPath} uncPath - UNC path to disconnect
- * @returns {boolean} - True if the path was disconnected.
+ * @param uncPath - UNC path to disconnect
+ * @returns True if the path was disconnected.
  */
 export function disconnectUncPath(uncPath: UncPath): boolean {
   if (!isWindows() || !uncPathIsSafe(uncPath)) {

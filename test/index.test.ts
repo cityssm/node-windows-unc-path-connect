@@ -1,11 +1,12 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable security/detect-non-literal-fs-filename */
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/no-magic-numbers, security/detect-non-literal-fs-filename, unicorn/prefer-string-raw */
 
 import assert from 'node:assert'
 import fs from 'node:fs/promises'
 import { describe, it } from 'node:test'
 
 import {
+  type UncPath,
   type UncPathOptions,
   connectToUncPath,
   disconnectUncPath
@@ -45,17 +46,19 @@ await describe('windows-unc-path-connect', async () => {
 })
 
 await describe('windows-unc-path-connect/validators', async () => {
-  await describe('uncPathIsSafe()', async () => {
-    await it('Returns "true" for good UNC paths', async () => {
-      const goodUncPaths = ['\\\\192.168.1.1\\folder']
 
+  const goodUncPaths: UncPath[] = ['\\\\192.168.1.1\\folder']
+
+  await describe('uncPathIsSafe()', async () => {
+    await it('Returns "true" for good UNC paths', () => {
       for (const goodUncPath of goodUncPaths) {
         assert.strictEqual(uncPathIsSafe(goodUncPath), true)
       }
     })
 
-    await it('Returns "false" for bad UNC paths', async () => {
+    await it('Returns "false" for bad UNC paths', () => {
       const badUncPaths = [
+        // eslint-disable-next-line sonarjs/no-hardcoded-ip
         '192.168.1.1', // missing slashes
         '\\192.168.1.1', // missing double slash beginning
         '\\\\192.168.1.1\\folder" /delete' // includes double quote
@@ -68,40 +71,42 @@ await describe('windows-unc-path-connect/validators', async () => {
   })
 
   await describe('uncPathOptionsHaveCredentials()', async () => {
-    await it('Returns "true" for options with credentials', async () => {
+    await it('Returns "true" for options with credentials', () => {
       assert.strictEqual(
         uncPathOptionsHaveCredentials({
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
           userName: 'user',
+          // eslint-disable-next-line sonarjs/no-hardcoded-credentials
           password: 'pass'
         }),
         true
       )
     })
 
-    await it('Returns "false" for options without credentials', async () => {
+    await it('Returns "false" for options without credentials', () => {
       const optionsWithoutCredentials: UncPathOptions[] = [
         {
-          uncPath: '\\\\192.168.1.1\\folder'
+          uncPath: goodUncPaths[0]
         },
         {
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
           userName: ''
         },
         {
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
           userName: 'noPass'
         },
         {
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
           password: ''
         },
         {
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
+          // eslint-disable-next-line sonarjs/no-hardcoded-credentials
           password: 'noUser'
         },
         {
-          uncPath: '\\\\192.168.1.1\\folder',
+          uncPath: goodUncPaths[0],
           userName: '',
           password: ''
         }
