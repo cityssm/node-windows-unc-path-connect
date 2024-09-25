@@ -44,3 +44,4 @@ export function disconnectUncPath(uncPath) {
         return false;
     }
 }
+export { isWindows, uncPathIsSafe, uncPathOptionsAreSafe } from './validators.js';

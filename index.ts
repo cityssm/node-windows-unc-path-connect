@@ -94,3 +94,9 @@ export type {
   UncPathOptionsWithCredentials,
   ConnectOptions
 } from './types.js'
+
+export {
+  isWindows,
+  uncPathIsSafe,
+  uncPathOptionsAreSafe
+} from './validators.js'
