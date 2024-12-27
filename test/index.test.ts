@@ -26,11 +26,15 @@ await describe('windows-unc-path-connect', async () => {
       disconnectUncPath(path.uncPath)
 
       // Reading files should fail
+      let canReadFiles = false
+
       try {
         await fs.readdir(path.uncPath)
+        canReadFiles = true
+      } catch {}
+
+      if (canReadFiles) {
         assert.fail('Reading directory successful after deleting path.')
-      } catch {
-        assert.ok(true)
       }
 
       // Connect to share
@@ -58,7 +62,7 @@ await describe('windows-unc-path-connect/validators', async () => {
     '\\192.168.1.1', // missing double slash beginning
     '\\\\192.168.1.1\\folder" /delete' // includes double quote
   ]
-  
+
   await describe('uncPathIsSafe()', async () => {
     await it('Returns "true" for good UNC paths', () => {
       for (const goodUncPath of goodUncPaths) {
@@ -67,7 +71,6 @@ await describe('windows-unc-path-connect/validators', async () => {
     })
 
     await it('Returns "false" for bad UNC paths', () => {
-
       for (const badUncPath of badUncPaths) {
         assert.strictEqual(uncPathIsSafe(badUncPath), false)
 
