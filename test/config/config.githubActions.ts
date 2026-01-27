@@ -6,3 +6,5 @@ export const validUncPathOptions: UncPathOptions[] = [
     uncPath: '\\\\localhost\\c$'
   }
 ]
+
+export const driveLetter = 'M:'
