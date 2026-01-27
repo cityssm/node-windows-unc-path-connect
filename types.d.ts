@@ -4,10 +4,12 @@ export interface UncPathOptionsWithoutCredentials {
     uncPath: UncPath;
 }
 export type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
-    userName: Exclude<string, ''>;
     password: Exclude<string, ''>;
+    userName: Exclude<string, ''>;
 };
-export type UncPathOptions = UncPathOptionsWithoutCredentials | UncPathOptionsWithCredentials;
+export type UncPathOptions = UncPathOptionsWithCredentials | UncPathOptionsWithoutCredentials;
 export interface ConnectOptions {
     deleteOnExit: boolean;
+    driveLetter: `${Uppercase<string>}:`;
+    persistent: boolean;
 }

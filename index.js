@@ -1,23 +1,35 @@
 import { execSync } from 'node:child_process';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
-import { isWindows, uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from './validators.js';
-const debug = Debug('windows-unc-path-connect');
+import { DEBUG_NAMESPACE } from './debug.config.js';
+import { driveLetterIsSafe, isWindows, uncPathIsSafe, uncPathOptionsAreSafe, uncPathOptionsHaveCredentials } from './validators.js';
+const timeoutMilliseconds = 30_000;
+const debug = Debug(`${DEBUG_NAMESPACE}:index`);
 export function connectToUncPath(uncPathOptions, connectOptions) {
     if (!isWindows() || !uncPathOptionsAreSafe(uncPathOptions)) {
         return false;
     }
     debug(`Connecting to share: ${uncPathOptions.uncPath}`);
-    let command = `net use "${uncPathOptions.uncPath}"`;
+    const commandPieces = ['net use'];
+    if (connectOptions?.driveLetter) {
+        commandPieces.push(connectOptions.driveLetter);
+    }
+    commandPieces.push(`"${uncPathOptions.uncPath}"`);
+    if (connectOptions?.persistent) {
+        commandPieces.push('/persistent:yes');
+    }
     if (uncPathOptionsHaveCredentials(uncPathOptions)) {
-        command += ` /user:"${uncPathOptions.userName}" "${uncPathOptions.password}"`;
+        commandPieces.push(`/user:"${uncPathOptions.userName}" "${uncPathOptions.password}"`);
     }
     try {
-        const output = execSync(command, { stdio: 'pipe' });
+        const output = execSync(commandPieces.join(' '), {
+            stdio: 'pipe',
+            timeout: timeoutMilliseconds
+        });
         debug(output.toString().trim());
         if (connectOptions?.deleteOnExit ?? false) {
             exitHook(() => {
-                disconnectUncPath(uncPathOptions.uncPath);
+                disconnectUncPath(connectOptions?.driveLetter ?? uncPathOptions.uncPath);
             });
         }
         return output.includes('command completed successfully');
@@ -28,20 +40,30 @@ export function connectToUncPath(uncPathOptions, connectOptions) {
             .includes('Multiple connections to a server or shared resource');
     }
 }
-export function disconnectUncPath(uncPath) {
-    if (!isWindows() || !uncPathIsSafe(uncPath)) {
+export function disconnectUncPath(uncPathOrDriveLetter) {
+    if (!isWindows() ||
+        (!uncPathIsSafe(uncPathOrDriveLetter) &&
+            !driveLetterIsSafe(uncPathOrDriveLetter))) {
         return false;
     }
-    debug(`Disconnecting share: ${uncPath}`);
-    const command = `net use "${uncPath}" /delete`;
+    debug(`Disconnecting share: ${uncPathOrDriveLetter}`);
+    const command = `net use "${uncPathOrDriveLetter}" /delete`;
     try {
-        const output = execSync(command, { stdio: 'pipe' });
+        const output = execSync(command, {
+            stdio: 'pipe',
+            timeout: timeoutMilliseconds
+        });
         debug(output.toString().trim());
         return (output.includes('deleted successfully') ||
             output.includes('connection could not be found'));
     }
-    catch {
+    catch (error) {
+        const errorString = error.toString();
+        if (errorString.includes('network connection could not be found')) {
+            return true;
+        }
+        debug(errorString);
         return false;
     }
 }
-export { isWindows, uncPathIsSafe, uncPathOptionsAreSafe } from './validators.js';
+export { driveLetterIsSafe, isWindows, uncPathIsSafe, uncPathOptionsAreSafe } from './validators.js';

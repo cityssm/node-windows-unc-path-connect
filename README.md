@@ -2,8 +2,6 @@
 
 [![npm (scoped)](https://img.shields.io/npm/v/%40cityssm/windows-unc-path-connect)](https://www.npmjs.com/package/@cityssm/windows-unc-path-connect)
 [![DeepSource](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect.svg/?label=active+issues&show_trend=true&token=kMenIfdyEcHVDtebaPlgkjFy)](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect/)
-[![Maintainability](https://api.codeclimate.com/v1/badges/0c0f2c336c22c3c889fa/maintainability)](https://codeclimate.com/github/cityssm/node-windows-unc-path-connect/maintainability)
-[![DeepSource](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect.svg/?label=code+coverage&show_trend=false&token=kMenIfdyEcHVDtebaPlgkjFy)](https://app.deepsource.com/gh/cityssm/node-windows-unc-path-connect/)
 [![Coverage Testing](https://github.com/cityssm/node-windows-unc-path-connect/actions/workflows/coverage.yml/badge.svg)](https://github.com/cityssm/node-windows-unc-path-connect/actions/workflows/coverage.yml)
 
 Ensures a UNC path that requires a user name and password
@@ -33,8 +31,14 @@ const success = connectToUncPath(
     password: 'p@ss'
   },
   {
-    // Attempt to clean up connection on application shutdown
-    deleteOnExit: true
+    // Optionally attempt to clean up connection on application shutdown.
+    deleteOnExit: true,
+
+    // Optionally assign a drive letter.
+    driveLetter: 'M:',
+
+    // Optionally persist the connection after restart.
+    persistent: true
   }
 )
 

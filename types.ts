@@ -7,17 +7,27 @@ export interface UncPathOptionsWithoutCredentials {
 }
 
 export type UncPathOptionsWithCredentials = UncPathOptionsWithoutCredentials & {
-  userName: Exclude<string, ''>
   password: Exclude<string, ''>
+  userName: Exclude<string, ''>
 }
 
 export type UncPathOptions =
-  | UncPathOptionsWithoutCredentials
   | UncPathOptionsWithCredentials
+  | UncPathOptionsWithoutCredentials
 
 export interface ConnectOptions {
   /**
    * Attempt to disconnect from the UNC path when the application exits.
    */
   deleteOnExit: boolean
+
+  /**
+   * Drive letter to map the UNC path to (e.g., 'Z:').
+   */
+  driveLetter: `${Uppercase<string>}:`
+
+  /**
+   * Whether the connection should be persistent (reconnect on login).
+   */
+  persistent: boolean
 }

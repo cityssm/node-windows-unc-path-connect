@@ -45,6 +45,16 @@ export function uncPathIsSafe(uncPath: string): uncPath is UncPath {
 }
 
 /**
+ * Ensures a drive letter is safe.
+ * @param driveLetter - Drive letter.
+ * @returns True if the drive letter is safe for use.
+ */
+export function driveLetterIsSafe(driveLetter: string): boolean {
+  const driveLetterPattern = /^[A-Z]:$/v
+  return driveLetterPattern.test(driveLetter)
+}
+
+/**
  * Ensures the options are safe to use.
  * @param uncPathOptions - UNC path options.
  * @returns True if the options are safe to use.
@@ -54,7 +64,6 @@ export function uncPathOptionsAreSafe(uncPathOptions: UncPathOptions): boolean {
     return false
   }
 
-  // eslint-disable-next-line sonarjs/prefer-single-boolean-return
   if (
     uncPathOptionsHaveCredentials(uncPathOptions) &&
     (stringHasForbiddenCharacters(uncPathOptions.userName) ||

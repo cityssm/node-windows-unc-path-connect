@@ -1,26 +1,29 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
-/* eslint-disable sonarjs/os-command */
+/* eslint-disable sonarjs/os-command -- It's necessary use of OS commands for drive operations */
 
 import { execSync } from 'node:child_process'
 
 import Debug from 'debug'
 import exitHook from 'exit-hook'
 
-import type { ConnectOptions, UncPath, UncPathOptions } from './types.js'
+import { DEBUG_NAMESPACE } from './debug.config.js'
+import type { ConnectOptions, UncPathOptions } from './types.js'
 import {
+  driveLetterIsSafe,
   isWindows,
   uncPathIsSafe,
   uncPathOptionsAreSafe,
   uncPathOptionsHaveCredentials
 } from './validators.js'
 
-const debug = Debug('windows-unc-path-connect')
+const timeoutMilliseconds = 30_000
+
+const debug = Debug(`${DEBUG_NAMESPACE}:index`)
 
 /**
  * Connects to a given UNC path.
  * @param uncPathOptions - UNC path and optional connection credentials.
  * @param connectOptions - Optional options for the connection.
- * @returns True when the connection is made successfully.
+ * @returns `true` when the connection is made successfully.
  */
 export function connectToUncPath(
   uncPathOptions: UncPathOptions,
@@ -32,22 +35,35 @@ export function connectToUncPath(
 
   debug(`Connecting to share: ${uncPathOptions.uncPath}`)
 
-  let command = `net use "${uncPathOptions.uncPath}"`
+  const commandPieces = ['net use']
+
+  if (connectOptions?.driveLetter) {
+    commandPieces.push(connectOptions.driveLetter)
+  }
+
+  commandPieces.push(`"${uncPathOptions.uncPath}"`)
+
+  if (connectOptions?.persistent) {
+    commandPieces.push('/persistent:yes')
+  }
 
   if (uncPathOptionsHaveCredentials(uncPathOptions)) {
-    command += ` /user:"${uncPathOptions.userName}" "${
-      uncPathOptions.password
-    }"`
+    commandPieces.push(
+      `/user:"${uncPathOptions.userName}" "${uncPathOptions.password}"`
+    )
   }
 
   try {
-    const output = execSync(command, { stdio: 'pipe' })
+    const output = execSync(commandPieces.join(' '), {
+      stdio: 'pipe',
+      timeout: timeoutMilliseconds
+    })
 
     debug(output.toString().trim())
 
     if (connectOptions?.deleteOnExit ?? false) {
       exitHook(() => {
-        disconnectUncPath(uncPathOptions.uncPath)
+        disconnectUncPath(connectOptions?.driveLetter ?? uncPathOptions.uncPath)
       })
     }
 
@@ -61,20 +77,27 @@ export function connectToUncPath(
 
 /**
  * Disconnects a given UNC path.
- * @param uncPath - UNC path to disconnect
- * @returns True if the path was disconnected.
+ * @param uncPathOrDriveLetter - UNC path or drive letter to disconnect
+ * @returns `true` if the path was disconnected.
  */
-export function disconnectUncPath(uncPath: UncPath): boolean {
-  if (!isWindows() || !uncPathIsSafe(uncPath)) {
+export function disconnectUncPath(uncPathOrDriveLetter: string): boolean {
+  if (
+    !isWindows() ||
+    (!uncPathIsSafe(uncPathOrDriveLetter) &&
+      !driveLetterIsSafe(uncPathOrDriveLetter))
+  ) {
     return false
   }
 
-  debug(`Disconnecting share: ${uncPath}`)
+  debug(`Disconnecting share: ${uncPathOrDriveLetter}`)
 
-  const command = `net use "${uncPath}" /delete`
+  const command = `net use "${uncPathOrDriveLetter}" /delete`
 
   try {
-    const output = execSync(command, { stdio: 'pipe' })
+    const output = execSync(command, {
+      stdio: 'pipe',
+      timeout: timeoutMilliseconds
+    })
 
     debug(output.toString().trim())
 
@@ -82,20 +105,28 @@ export function disconnectUncPath(uncPath: UncPath): boolean {
       output.includes('deleted successfully') ||
       output.includes('connection could not be found')
     )
-  } catch {
+  } catch (error) {
+    const errorString = (error as Error).toString()
+
+    if (errorString.includes('network connection could not be found')) {
+      return true
+    }
+
+    debug(errorString)
     return false
   }
 }
 
 export type {
+  ConnectOptions,
   UncPath,
   UncPathOptions,
-  UncPathOptionsWithoutCredentials,
   UncPathOptionsWithCredentials,
-  ConnectOptions
+  UncPathOptionsWithoutCredentials
 } from './types.js'
 
 export {
+  driveLetterIsSafe,
   isWindows,
   uncPathIsSafe,
   uncPathOptionsAreSafe

@@ -14,6 +14,10 @@ export function uncPathOptionsHaveCredentials(uncPathOptions) {
 export function uncPathIsSafe(uncPath) {
     return (uncPath.startsWith(uncPathPrefix) && !stringHasForbiddenCharacters(uncPath));
 }
+export function driveLetterIsSafe(driveLetter) {
+    const driveLetterPattern = /^[A-Z]:$/v;
+    return driveLetterPattern.test(driveLetter);
+}
 export function uncPathOptionsAreSafe(uncPathOptions) {
     if (!uncPathIsSafe(uncPathOptions.uncPath)) {
         return false;

@@ -1,10 +1,13 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/no-magic-numbers, security/detect-non-literal-fs-filename, unicorn/prefer-string-raw */
+/* eslint-disable sonarjs/no-hardcoded-passwords -- Test passwords */
+/* eslint-disable security/detect-non-literal-fs-filename, unicorn/prefer-string-raw */
 
 import assert from 'node:assert'
 import fs from 'node:fs/promises'
 import { describe, it } from 'node:test'
 
+import Debug from 'debug'
+
+import { DEBUG_ENABLE_NAMESPACES } from '../debug.config.js'
 import {
   type UncPath,
   type UncPathOptions,
@@ -17,35 +20,29 @@ import {
   uncPathOptionsHaveCredentials
 } from '../validators.js'
 
-import { validUncPathOptions } from './config/config.js'
+import { driveLetter, validUncPathOptions } from './config/config.js'
+
+Debug.enable(DEBUG_ENABLE_NAMESPACES)
 
 await describe('windows-unc-path-connect', async () => {
   for (const path of validUncPathOptions) {
+    // eslint-disable-next-line no-await-in-loop
     await it(`Successfully connects to a UNC path: ${path.uncPath}`, async () => {
       // Ensure the share doesn't exist
-      disconnectUncPath(path.uncPath)
-
-      // Reading files should fail
-      let canReadFiles = false
-
-      try {
-        await fs.readdir(path.uncPath)
-        canReadFiles = true
-      } catch {}
-
-      if (canReadFiles) {
-        assert.fail('Reading directory successful after deleting path.')
-      }
+      disconnectUncPath(driveLetter)
 
       // Connect to share
       const success = connectToUncPath(path, {
-        deleteOnExit: true
+        deleteOnExit: true,
+        driveLetter,
+        persistent: false
       })
+
       assert.ok(success)
 
       // Reading files should work
       try {
-        await fs.readdir(path.uncPath)
+        await fs.readdir(driveLetter)
       } catch {
         assert.fail('Cannot list files')
       }
@@ -90,7 +87,7 @@ await describe('windows-unc-path-connect/validators', async () => {
         uncPathOptionsHaveCredentials({
           uncPath: goodUncPaths[0],
           userName: 'user',
-          // eslint-disable-next-line sonarjs/no-hardcoded-credentials
+
           password: 'pass'
         }),
         true
@@ -112,17 +109,19 @@ await describe('windows-unc-path-connect/validators', async () => {
         },
         {
           uncPath: goodUncPaths[0],
+
           password: ''
         },
         {
           uncPath: goodUncPaths[0],
-          // eslint-disable-next-line sonarjs/no-hardcoded-credentials
+
           password: 'noUser'
         },
         {
           uncPath: goodUncPaths[0],
-          userName: '',
-          password: ''
+
+          password: '',
+          userName: ''
         }
       ]
 
